@@ -1,7 +1,7 @@
 # точка входа: принимает тикеры, запускает бэктест, печатает/рисует результат
 from data import load_adj_close
 from backtest import run_backtest
-from report import show_charts
+from report import show_charts, build_report
 
 if __name__ == "__main__":
 
@@ -10,9 +10,20 @@ if __name__ == "__main__":
     # product_period = int(input())
     product_period = 5  # Configuration
     product_period_days = product_period * 252
-    dt = 2      # Configuration    # сдвиг бэктеста
-    prices = load_adj_close(tickers,"2015-01-01", "2026-02-10")
+    dt = 1      # Configuration, сдвиг бэктест
+    rf = 0      # Безрисковая ставка
+    prices = load_adj_close(tickers,"2010-01-01", "2026-02-10")
 
     df = run_backtest(prices, product_period_days, dt)
+    print(df)
+    
+    res_df, benchmarks = build_report(df=df, rf=rf)
+    print(res_df)
+    print("--- Результаты бэктеста ---")
+    for key, value in benchmarks.items():
+        if key == 'Sharpe':
+            print(f'{key} {value:.2f}')
+        else:
+            print(f'{key} {value:.2%}')
 
-    show_charts(df)
+    show_charts(res_df)
